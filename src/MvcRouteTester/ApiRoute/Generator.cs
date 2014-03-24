@@ -184,13 +184,20 @@ namespace MvcRouteTester.ApiRoute
 
 		private IHttpRouteData GetRouteData()
 		{
-			if (! request.Properties.Any(prop => prop.Value is HttpRouteData))
-			{
-				return null;
-			}
+            IHttpRouteData routeData = null;
+            var dict = request.Properties;
+            if (dict.Values.First() is IHttpRouteData)
+            {
+                routeData = (IHttpRouteData)dict.Values.First();
+                dict = routeData.Values;
+            }
+            if (dict.Values.First() is IHttpRouteData[])
+            {
+                routeData = ((IHttpRouteData[])dict.Values.First())[0];
+                dict = routeData.Values;
+            }
 
-			var routeDataProp = request.Properties.First(prop => prop.Value is HttpRouteData);
-			return routeDataProp.Value as IHttpRouteData;
+			return routeData;
 		}
 
 		public string ActionName()
